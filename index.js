@@ -11,6 +11,11 @@ var listMixin = {
       resort: this.resort
     };
   },
+  componentWillReceiveProps: function(nextProps) {
+      if (this.state.items != nextProps.list) {
+        this.setState({items: nextProps.list})
+      }
+    },
   // movedComponent: component to move
   // moveElemEvent: mouse event object triggered on moveElem
   bindMove: function(movedComponent, moveElemEvent) {
@@ -114,10 +119,10 @@ var listMixin = {
     var items, movedItem;
     if (oldPosition !== newPosition) {
       items = this.state.items;
-      // First: remove item from old position
-      movedItem = items.splice(oldPosition, 1)[0];
-      // Then add to new position
-      items.splice(newPosition, 0, movedItem);
+      // First: get item from old position
+      movedItem = items.get(oldPosition)
+      // Then adjust list
+      items = items.toSeq().splice(oldPosition, 1).splice(newPosition, 0, movedItem).toList();
       this.setState({'items': items});
       if (this.onResorted) {
         this.onResorted(items);
